@@ -22,12 +22,13 @@
 
     <script>
         function getLocAndGenerate() {
-            var subject = document.getElementById("subject").value.trim();
-            if (!subject) { alert("Enter subject!"); return; }
+            var subjectInput = document.getElementById("subject").value.trim();
+            if (!subjectInput) { alert("Enter subject!"); return; }
 
             document.getElementById("status").innerText = "Getting your GPS location...";
 
             if (navigator.geolocation) {
+                // We just ask for location here. The "showQR" function will handle the rest.
                 navigator.geolocation.getCurrentPosition(showQR, showError);
             } else {
                 document.getElementById("status").innerText = "Geolocation is not supported by this browser.";
@@ -35,6 +36,9 @@
         }
 
         function showQR(position) {
+            // FIX IS HERE: We get the value INSIDE this function
+            var subject = document.getElementById("subject").value.trim();
+            
             var lat = position.coords.latitude;
             var lng = position.coords.longitude;
             var now = new Date();
@@ -42,10 +46,11 @@
             // Format: YYYY-MM-DD
             var dateStr = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + String(now.getDate()).padStart(2, '0');
             
-            // Timestamp (milliseconds) for 5-minute check
+            // Timestamp (milliseconds)
             var timeTs = now.getTime(); 
 
             // DATA FORMAT: Subject | Date | Timestamp | Lat | Lng
+            // Now "subject" is a text string, not the [object HTMLInputElement]
             var secretString = `${subject}|${dateStr}|${timeTs}|${lat}|${lng}`;
             
             // Generate QR
